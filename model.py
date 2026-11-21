@@ -138,8 +138,38 @@ def sample_bigram(P, itos, n, seed):
 
     return names
 
-# Step 6 - bigram_nll (not yet solved)
-# TODO: implement
+# Step 6 - bigram_nll
+def bigram_nll(P, words, stoi):
+    """Return the average negative log-likelihood per bigram as a Python float."""
+
+    # Initialize the total negative log-likelihood and bigram counter.
+    total_nll = 0.0
+    total_bigrams = 0
+
+    # Calculate the negative log-likelihood for every word.
+    for word in words:
+
+        # Add the boundary token at the beginning and end of the word.
+        chars = ["."] + list(word) + ["."]
+
+        # Convert characters into their corresponding integer IDs.
+        ids = [stoi[ch] for ch in chars]
+
+        # Calculate the negative log-likelihood of every consecutive bigram.
+        for first, second in zip(ids, ids[1:]):
+
+            # Add -log(P[first, second]) to the total loss.
+            total_nll -= torch.log(P[first, second]).item()
+
+            # Count the processed bigram.
+            total_bigrams += 1
+
+    # Prevent division by zero when no bigrams are available.
+    if total_bigrams == 0:
+        raise ValueError("Cannot calculate NLL because no bigrams were found.")
+
+    # Return the average negative log-likelihood as a Python float.
+    return total_nll / total_bigrams
 
 # Step 7 - bigram_dataset (not yet solved)
 # TODO: implement
