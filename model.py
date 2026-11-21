@@ -400,8 +400,21 @@ class MLP:
 
         return logits
 
-# Step 12 - evaluate_loss (not yet solved)
-# TODO: implement
+# Step 12 - evaluate_loss
+def evaluate_loss(model, X, Y):
+    """Return the mean cross-entropy loss as a Python float, without gradients."""
+
+    # Disable gradient tracking during evaluation.
+    with torch.no_grad():
+
+        # Perform the forward pass to obtain the model's output logits.
+        logits = model(X)
+
+        # Calculate the mean cross-entropy loss against the target IDs.
+        loss = F.cross_entropy(logits, Y)
+
+    # Convert the loss tensor into a standard Python float.
+    return loss.item()
 
 # Step 13 - train_mlp (not yet solved)
 # TODO: implement
