@@ -51,8 +51,33 @@ def build_vocab(words):
 
     return stoi, itos
 
-# Step 3 - bigram_counts (not yet solved)
-# TODO: implement
+# Step 3 - bigram_counts
+import torch
+
+def bigram_counts(words, stoi):
+    """Return a (V, V) int32 tensor of bigram counts, with '.' around every word."""
+
+    # Get the vocabulary size.
+    V = len(stoi)
+
+    # Initialize a matrix to store bigram transition counts.
+    # N[i, j] represents how often token j follows token i.
+    N = torch.zeros((V, V), dtype=torch.int32)
+
+    # Count character transitions for every word.
+    for word in words:
+
+        # Add the special boundary token at the beginning and end.
+        chars = ["."] + list(word) + ["."]
+
+        # Convert characters into their corresponding integer IDs.
+        ids = [stoi[ch] for ch in chars]
+
+        # Count each consecutive pair of tokens.
+        for ch1, ch2 in zip(ids, ids[1:]):
+            N[ch1, ch2] += 1
+
+    return N
 
 # Step 4 - bigram_probs (not yet solved)
 # TODO: implement
