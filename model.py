@@ -171,8 +171,33 @@ def bigram_nll(P, words, stoi):
     # Return the average negative log-likelihood as a Python float.
     return total_nll / total_bigrams
 
-# Step 7 - bigram_dataset (not yet solved)
-# TODO: implement
+# Step 7 - bigram_dataset
+def bigram_dataset(words, stoi):
+    """Return (xs, ys): input and next-token IDs for every bigram, as long tensors."""
+
+    # Store the input token IDs and their corresponding next-token IDs.
+    xs = []
+    ys = []
+
+    # Process every word in the dataset.
+    for word in words:
+
+        # Add the boundary token at the beginning and end of each word.
+        chars = ["."] + list(word) + ["."]
+
+        # Convert characters into their corresponding integer IDs.
+        ids = [stoi[ch] for ch in chars]
+
+        # Create input-target pairs from consecutive token IDs.
+        # Each input token predicts the token immediately following it.
+        xs.extend(ids[:-1])
+        ys.extend(ids[1:])
+
+    # Convert the lists into one-dimensional PyTorch long tensors.
+    xs = torch.tensor(xs, dtype=torch.long)
+    ys = torch.tensor(ys, dtype=torch.long)
+
+    return xs, ys
 
 # Step 8 - train_neural_bigram (not yet solved)
 # TODO: implement
