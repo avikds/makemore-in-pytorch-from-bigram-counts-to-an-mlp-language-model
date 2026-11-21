@@ -416,8 +416,56 @@ def evaluate_loss(model, X, Y):
     # Convert the loss tensor into a standard Python float.
     return loss.item()
 
-# Step 13 - train_mlp (not yet solved)
-# TODO: implement
+# Step 13 - train_mlp
+def train_mlp(model, X, Y, steps, batch_size, lr, seed):
+    """Train the MLP using minibatch gradient descent with learning-rate decay."""
+
+    # Create one seeded random number generator for reproducible minibatch sampling.
+    g = torch.Generator().manual_seed(seed)
+
+    # Store the minibatch loss from each training iteration.
+    losses = []
+
+    # Retrieve all trainable model parameters.
+    parameters = model.parameters()
+
+    # Perform minibatch gradient descent.
+    for step in range(steps):
+
+        # Use the initial learning rate for the first half of training.
+        # Reduce the learning rate by a factor of 10 for the remaining steps.
+        current_lr = lr if step < steps // 2 else lr / 10
+
+        # Randomly sample batch_size indices from the training dataset.
+        batch_indices = torch.randint(
+            0,
+            X.shape[0],
+            (batch_size,),
+            generator=g
+        )
+
+        # Reset the gradients of all model parameters.
+        for p in parameters:
+            p.grad = None
+
+        # Perform a forward pass using the selected minibatch.
+        logits = model(X[batch_indices])
+
+        # Calculate the mean cross-entropy loss for the minibatch.
+        loss = F.cross_entropy(logits, Y[batch_indices])
+
+        # Record the loss before updating the model parameters.
+        losses.append(loss.item())
+
+        # Backpropagate to calculate gradients for all model parameters.
+        loss.backward()
+
+        # Update every parameter using gradient descent.
+        with torch.no_grad():
+            for p in parameters:
+                p -= current_lr * p.grad
+
+    return losses
 
 # Step 14 - sample_mlp (not yet solved)
 # TODO: implement
