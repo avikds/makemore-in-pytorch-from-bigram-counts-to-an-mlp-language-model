@@ -32,8 +32,24 @@ def load_names():
 
     return names
 
-# Step 2 - build_vocab (not yet solved)
-# TODO: implement
+# Step 2 - build_vocab
+def build_vocab(words):
+    """Return (stoi, itos): '.' -> 0, the sorted characters -> 1, 2, ..."""
+
+    # Collect all distinct characters and sort them alphabetically.
+    # Reserve '.' exclusively as the special start/end token.
+    chars = sorted(set("".join(words)) - {"."})
+
+    # Map each character to a unique integer, starting from 1.
+    stoi = {ch: i + 1 for i, ch in enumerate(chars)}
+
+    # Assign 0 to the special token representing the start/end of a name.
+    stoi["."] = 0
+
+    # Create the exact inverse mapping: integer IDs to characters.
+    itos = {i: ch for ch, i in stoi.items()}
+
+    return stoi, itos
 
 # Step 3 - bigram_counts (not yet solved)
 # TODO: implement
