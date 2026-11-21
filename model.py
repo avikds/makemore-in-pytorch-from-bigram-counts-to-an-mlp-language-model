@@ -467,6 +467,60 @@ def train_mlp(model, X, Y, steps, batch_size, lr, seed):
 
     return losses
 
-# Step 14 - sample_mlp (not yet solved)
-# TODO: implement
+# Step 14 - sample_mlp
+def sample_mlp(model, itos, n, seed):
+    """Sample n names from the MLP, starting each from an all-'.' context."""
+
+    # Create one seeded random number generator for reproducible sampling.
+    g = torch.Generator().manual_seed(seed)
+
+    # Store the generated names.
+    names = []
+
+    # Disable gradient tracking during name generation.
+    with torch.no_grad():
+
+        # Generate the requested number of names.
+        for _ in range(n):
+
+            # Initialize the context with block_size boundary tokens (ID 0).
+            context = [0] * model.block_size
+
+            # Store the characters generated for the current name.
+            name_chars = []
+
+            while True:
+
+                # Convert the current context into a tensor of shape
+                # (1, block_size), as required by the MLP.
+                x = torch.tensor([context], dtype=torch.long)
+
+                # Obtain the output logits from the trained MLP.
+                logits = model(x)
+
+                # Convert logits into probabilities using softmax.
+                probs = F.softmax(logits, dim=1)
+
+                # Sample the next character ID from the probability distribution.
+                next_token = torch.multinomial(
+                    probs[0],
+                    num_samples=1,
+                    replacement=True,
+                    generator=g
+                ).item()
+
+                # Slide the context window and include the sampled token.
+                context = context[1:] + [next_token]
+
+                # Stop generating when the boundary token (ID 0) appears.
+                if next_token == 0:
+                    break
+
+                # Convert the sampled token ID into its corresponding character.
+                name_chars.append(itos[next_token])
+
+            # Join the generated characters into a complete name.
+            names.append("".join(name_chars))
+
+    return names
 

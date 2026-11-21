@@ -23,7 +23,7 @@ python scaffold.py
 - [x] **11.** MLP
 - [x] **12.** evaluate_loss
 - [x] **13.** train_mlp
-- [ ] **14.** sample_mlp
+- [x] **14.** sample_mlp
 
 ---
 
