@@ -328,8 +328,77 @@ def split_words(words, seed):
 
     return train, dev, test
 
-# Step 11 - MLP (not yet solved)
-# TODO: implement
+# Step 11 - MLP
+class MLP:
+    def __init__(self, vocab_size, block_size, emb_dim, hidden, seed):
+        """Draw C, W1, b1, W2, b2 (in that order) from one seeded generator; all require grad."""
+
+        # Store the context window size.
+        self.block_size = block_size
+
+        # Create one seeded generator for reproducible parameter initialization.
+        g = torch.Generator().manual_seed(seed)
+
+        # Character embedding table:
+        # Maps each character ID to an embedding vector.
+        self.C = torch.randn(
+            (vocab_size, emb_dim),
+            generator=g,
+            requires_grad=True
+        )
+
+        # First layer weights:
+        # Maps the concatenated character embeddings to the hidden layer.
+        self.W1 = torch.randn(
+            (block_size * emb_dim, hidden),
+            generator=g,
+            requires_grad=True
+        )
+
+        # First layer bias.
+        self.b1 = torch.randn(
+            (hidden,),
+            generator=g,
+            requires_grad=True
+        )
+
+        # Second layer weights:
+        # Maps hidden layer activations to vocabulary-sized output logits.
+        self.W2 = torch.randn(
+            (hidden, vocab_size),
+            generator=g,
+            requires_grad=True
+        )
+
+        # Second layer bias.
+        self.b2 = torch.randn(
+            (vocab_size,),
+            generator=g,
+            requires_grad=True
+        )
+
+    def parameters(self):
+        """Return all trainable parameters in the required order."""
+
+        return [self.C, self.W1, self.b1, self.W2, self.b2]
+
+    def __call__(self, X):
+        """Convert context token IDs into vocabulary-sized output logits."""
+
+        # Look up the embedding vector for every character in each context.
+        emb = self.C[X]
+
+        # Flatten each example's embeddings into a single feature vector.
+        # Resulting shape: (n, block_size * emb_dim).
+        emb = emb.reshape(emb.shape[0], -1)
+
+        # Hidden layer: linear transformation followed by tanh activation.
+        h = torch.tanh(emb @ self.W1 + self.b1)
+
+        # Output layer: transform hidden activations into vocabulary logits.
+        logits = h @ self.W2 + self.b2
+
+        return logits
 
 # Step 12 - evaluate_loss (not yet solved)
 # TODO: implement
