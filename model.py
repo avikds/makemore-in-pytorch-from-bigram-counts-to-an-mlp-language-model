@@ -79,8 +79,23 @@ def bigram_counts(words, stoi):
 
     return N
 
-# Step 4 - bigram_probs (not yet solved)
-# TODO: implement
+# Step 4 - bigram_probs
+def bigram_probs(N, smoothing=1):
+    """Return row-normalized float probabilities after adding smoothing to every count."""
+
+    # Convert the integer count matrix to floating-point values
+    # and add the smoothing value to every cell.
+    counts = N.float() + smoothing
+
+    # Calculate the total count for each row.
+    # keepdim=True preserves the shape for broadcasting.
+    row_totals = counts.sum(dim=1, keepdim=True)
+
+    # Normalize each row to obtain transition probabilities.
+    # Each row represents the probability distribution of the next character.
+    P = counts / row_totals
+
+    return P
 
 # Step 5 - sample_bigram (not yet solved)
 # TODO: implement
