@@ -199,8 +199,73 @@ def bigram_dataset(words, stoi):
 
     return xs, ys
 
-# Step 8 - train_neural_bigram (not yet solved)
-# TODO: implement
+# Step 8 - train_neural_bigram
+import torch.nn.functional as F
+
+def train_neural_bigram(xs, ys, vocab_size, steps, lr, reg, seed):
+    """Train a single linear layer using full-batch gradient descent.
+    
+    Returns:
+        W: Learned weight matrix of shape (vocab_size, vocab_size).
+        losses: List of training losses recorded before each update.
+    """
+
+    # Initialize a seeded random number generator for reproducibility.
+    g = torch.Generator().manual_seed(seed)
+
+    # Initialize the weight matrix with random values.
+    # Each row represents an input character, and each column represents
+    # the logits for predicting the next character.
+    W = torch.randn(
+        (vocab_size, vocab_size),
+        generator=g,
+        requires_grad=True
+    )
+
+    # Store the loss from each training iteration.
+    losses = []
+
+    # Create row indices for selecting the correct target probabilities.
+    row_indices = torch.arange(xs.shape[0])
+
+    # Perform full-batch gradient descent.
+    for _ in range(steps):
+
+        # Convert input token IDs into one-hot encoded floating-point vectors.
+        xenc = F.one_hot(xs, num_classes=vocab_size).float()
+
+        # Forward pass: calculate logits using the linear layer.
+        logits = xenc @ W
+
+        # Convert logits into unnormalized probabilities.
+        counts = logits.exp()
+
+        # Apply softmax normalization so each probability row sums to 1.
+        probs = counts / counts.sum(dim=1, keepdim=True)
+
+        # Calculate the average negative log-likelihood for correct targets.
+        nll_loss = -torch.log(probs[row_indices, ys]).mean()
+
+        # Add L2 regularization to penalize large weight values.
+        reg_loss = reg * W.pow(2).mean()
+
+        # Combine the negative log-likelihood and regularization losses.
+        loss = nll_loss + reg_loss
+
+        # Record the current loss before updating the weights.
+        losses.append(loss.item())
+
+        # Reset the gradients from the previous iteration.
+        W.grad = None
+
+        # Backpropagate to calculate gradients of the loss with respect to W.
+        loss.backward()
+
+        # Update the weights using gradient descent without tracking gradients.
+        with torch.no_grad():
+            W -= lr * W.grad
+
+    return W, losses
 
 # Step 9 - build_context_dataset (not yet solved)
 # TODO: implement
