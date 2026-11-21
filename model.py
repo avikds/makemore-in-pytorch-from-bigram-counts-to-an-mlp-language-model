@@ -267,8 +267,42 @@ def train_neural_bigram(xs, ys, vocab_size, steps, lr, reg, seed):
 
     return W, losses
 
-# Step 9 - build_context_dataset (not yet solved)
-# TODO: implement
+# Step 9 - build_context_dataset
+def build_context_dataset(words, stoi, block_size):
+    """Return (X, Y): '.'-padded rolling contexts and next-token IDs."""
+
+    # Store the context windows and their corresponding target IDs.
+    X = []
+    Y = []
+
+    # Process each word independently.
+    for word in words:
+
+        # Initialize the context with block_size boundary tokens.
+        context = [0] * block_size
+
+        # Process every character, including the final boundary token.
+        for ch in list(word) + ["."]:
+
+            # Convert the current character into its integer ID.
+            ix = stoi[ch]
+
+            # Record a copy of the current context.
+            X.append(context.copy())
+
+            # Record the current character as the prediction target.
+            Y.append(ix)
+
+            # Slide the context window one position to the left
+            # and append the current character ID.
+            context = context[1:] + [ix]
+
+    # Convert the collected contexts and targets into long tensors.
+    # Reshape X to ensure the required (n, block_size) dimensions.
+    X = torch.tensor(X, dtype=torch.long).reshape(-1, block_size)
+    Y = torch.tensor(Y, dtype=torch.long)
+
+    return X, Y
 
 # Step 10 - split_words (not yet solved)
 # TODO: implement
