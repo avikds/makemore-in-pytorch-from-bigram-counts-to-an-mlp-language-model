@@ -304,8 +304,29 @@ def build_context_dataset(words, stoi, block_size):
 
     return X, Y
 
-# Step 10 - split_words (not yet solved)
-# TODO: implement
+# Step 10 - split_words
+import random
+
+def split_words(words, seed):
+    """Shuffle a copy with random.Random(seed); return the 80/10/10 (train, dev, test) split."""
+
+    # Create a copy so that the original words list remains unchanged.
+    shuffled_words = words.copy()
+
+    # Shuffle the copied list using a seeded random generator.
+    # This ensures reproducible and consistent dataset splitting.
+    random.Random(seed).shuffle(shuffled_words)
+
+    # Calculate the boundaries for the 80/10/10 split.
+    n1 = int(0.8 * len(shuffled_words))
+    n2 = int(0.9 * len(shuffled_words))
+
+    # Divide the shuffled dataset into training, development, and test sets.
+    train = shuffled_words[:n1]
+    dev = shuffled_words[n1:n2]
+    test = shuffled_words[n2:]
+
+    return train, dev, test
 
 # Step 11 - MLP (not yet solved)
 # TODO: implement

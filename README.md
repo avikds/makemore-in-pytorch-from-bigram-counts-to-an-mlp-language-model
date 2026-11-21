@@ -19,7 +19,7 @@ python scaffold.py
 - [x] **7.** bigram_dataset
 - [x] **8.** train_neural_bigram
 - [x] **9.** build_context_dataset
-- [ ] **10.** split_words
+- [x] **10.** split_words
 - [ ] **11.** MLP
 - [ ] **12.** evaluate_loss
 - [ ] **13.** train_mlp
