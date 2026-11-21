@@ -97,8 +97,46 @@ def bigram_probs(N, smoothing=1):
 
     return P
 
-# Step 5 - sample_bigram (not yet solved)
-# TODO: implement
+# Step 5 - sample_bigram
+def sample_bigram(P, itos, n, seed):
+    """Sample n names from the bigram model using a seeded generator."""
+
+    # Create one random number generator for reproducible sampling.
+    g = torch.Generator().manual_seed(seed)
+
+    names = []
+
+    # Generate the requested number of names.
+    for _ in range(n):
+
+        # Every name starts with the special boundary token (ID 0).
+        current = 0
+        name_chars = []
+
+        while True:
+
+            # Sample the next token from the current token's probability row.
+            next_token = torch.multinomial(
+                P[current],
+                num_samples=1,
+                replacement=True,
+                generator=g
+            ).item()
+
+            # Stop generating when the boundary token appears again.
+            if next_token == 0:
+                break
+
+            # Convert the sampled token ID back into its character.
+            name_chars.append(itos[next_token])
+
+            # Update the current token for the next sampling iteration.
+            current = next_token
+
+        # Join the sampled characters into a name.
+        names.append("".join(name_chars))
+
+    return names
 
 # Step 6 - bigram_nll (not yet solved)
 # TODO: implement
